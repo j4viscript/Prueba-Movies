@@ -478,16 +478,16 @@
                 },
                 artist(person) {
                     localStorage.setItem('person', JSON.stringify(person))
-                    window.location.href = "person.html"
+                    window.location.href = "/person.html"
 
                 },
                 getGenreMovies(genre) {
                     localStorage.setItem('genre', JSON.stringify(genre))
-                    window.location.href = "genre.html"
+                    window.location.href = "/genre.html"
                 },
                 getKeywordMovies(keyword) {
                     localStorage.setItem('keyword', JSON.stringify(keyword))
-                    window.location.href = "keyword.html"
+                    window.location.href = "/keyword.html"
                 },
                 getFavorites() {
                     let vue = this
@@ -710,21 +710,21 @@
                         });
                 },
                 home() {
-                    window.location.href = "homePage.html"
+                    window.location.href = "/homePage.html"
                 },
                 viewSeason(tv, season) {
                     console.log(tv)
                     console.log(season)
                     localStorage.setItem('tv', JSON.stringify(tv));
                     localStorage.setItem('season', JSON.stringify(season));
-                    window.location.href = "capitulos.html"
+                    window.location.href = "/capitulos.html"
                 },
                 viewSeasons(show,series){
                     console.log(show)
                     localStorage.setItem('show', JSON.stringify(show));
                     console.log(series)
                     localStorage.setItem('series', JSON.stringify(series));
-                    window.location.href = "seasons.html"
+                    window.location.href = "/seasons.html"
                 }
 
             },
