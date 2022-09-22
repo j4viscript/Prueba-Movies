@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/dist/output.css">
+    <link rel="stylesheet" href="/output.css">
     <title>Cuevana77</title>
 </head>
 
@@ -31,10 +31,10 @@
                 <!--Informacion personal del artista-->
                 <div class="card-body">
                     <h2 class="card-title">{{ bdartist.name }}</h2>
-                    <h1>Informacion Personal:</h1>
+                    <h1>Personal Info:</h1>
                     <ul class="flex flex-wrap">
                         <li class="flex">
-                            <h3 class="ml-5">Conocido por:</h3>
+                            <h3 class="ml-5">Known for:</h3>
                             <p class="ml-5">{{ bdartist.known_for_department }}</p>
                         </li>
                         <li class="flex">
@@ -42,24 +42,24 @@
                             <p class="ml-5">{{ bdartist.biography }}</p>
                         </li>
                         <li class="flex">
-                            <h3 class="ml-5">Peliculas y series:</h3>
+                            <h3 class="ml-5">Known Credits</h3>
                             <p class="ml-5">{{ works }}</p>
                         </li>
                         <li class="flex">
-                            <h3 class="ml-5">Sexo:</h3>
+                            <h3 class="ml-5">Gender:</h3>
                             <p class="ml-5" v-if="bdartist.gender==1">Mujer</p>
                             <p class="ml-5" v-else>Hombre</p>
                         </li>
                         <li class="flex">
-                            <h3 class="ml-5">Cumpleaños:</h3>
+                            <h3 class="ml-5">Birthday:</h3>
                             <p class="ml-5">{{ bdartist.birthday }}</p>
                         </li>
                         <li class="flex">
-                            <h3 class="ml-5">Lugar de Nacimiento:</h3>
+                            <h3 class="ml-5">Place of Birth:</h3>
                             <p class="ml-5">{{ bdartist.place_of_birth }}</p>
                         </li>
                         <li class="flex">
-                            <h3 class="ml-5">También Conocido Como:</h3>
+                            <h3 class="ml-5">Also Known As:</h3>
                             <p class="ml-5">{{ bdartist.also_known_as }}</p>
                         </li>
                         <li class="flex">
@@ -86,7 +86,7 @@
                 </div>
                 <div tabindex="0" class="collapse collapse-arrow w-3/4 border border-base-300 bg-base-100 rounded-box">
                     <div class="collapse-title text-xl font-medium">
-                        Filmografia
+                        Acting
                     </div>
                     <ul v-for="w in worksList" class="bg-gray-400 ">
                         <li class="collapse-content text-xl">
@@ -96,10 +96,10 @@
                             <p class="ml-5">{{ w.name }}</p>
                         </li>
                         <li class="collapse-content">
-                            <p class="ml-5 p-2.5">Personaje: {{ w.character }}</p>
+                            <p class="ml-5 p-2.5">Character: {{ w.character }}</p>
                         </li>
                         <li class="collapse-content">
-                            <p class="ml-5 border-b border-black p-2.5">Fecha de lanzamiento: {{ w.release_date }} {{
+                            <p class="ml-5 border-b border-black p-2.5">Release date: {{ w.release_date }} {{
                                 w.first_air_date }}</p>
                         </li>
                     </ul>
@@ -188,10 +188,10 @@
                         localStorage.setItem('series', JSON.stringify(show));
                         localStorage.setItem('type','series')
                     }
-                    window.location.href = 'movie.html';
+                    window.location.href = '/movie.html';
                 },
                 home(){
-                    window.location.href="homePage.html"
+                    window.location.href="/index.html"
                 }
 
             },

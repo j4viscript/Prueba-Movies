@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/dist/output.css">
+    <link rel="stylesheet" href="/output.css">
     <title>Lista de episodios</title>
 </head>
 <!--Titulo de la temporada-->
@@ -34,7 +34,7 @@
         <!--Numero de episodios-->
         <div>
             <h2>
-                capitulos: {{ numepisodios }}
+                Episodes: {{ numepisodios }}
             </h2>
         </div>
 
@@ -99,7 +99,7 @@
 
                     var config = {
                         method: 'get',
-                        url: 'https://api.themoviedb.org/3/tv/' + this.currShow.id + '/season/' + this.currSeason.season_number + '?&language=es-MX',
+                        url: 'https://api.themoviedb.org/3/tv/' + this.currShow.id + '/season/' + this.currSeason.season_number + '?&language=en-US',
                         headers: {
                             'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZDllZmVhNmYwNDI2MGJlZTM2YzkzNDlmNmQ2MGM1ZSIsInN1YiI6IjYzMWU2MWIxMGQyZjUzMDA4NDI5ZWUwNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.WWVZWdInybAOboJ10oRKUbWYhpCq0HJYyuPKvr8hybw'
                         }
@@ -126,7 +126,7 @@
                         });
 
                 },home(){
-					window.location.href="homePage.html"
+					window.location.href="/index.html"
 				}
             },
 

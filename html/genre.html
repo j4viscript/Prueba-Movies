@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/dist/output.css">
+    <link rel="stylesheet" href="/output.css">
     <title>Cuevana77</title>
 </head>
 
@@ -34,8 +34,8 @@
                     <p>{{movie.overview}}</p>
                     <div class="card-actions justify-end">
                         <button v-if="(type == 'movie')" @click="detail(movie,'movie')"
-                            class="btn btn-primary">Detalles</button>
-                        <button v-else @click="detail(movie,'series')" class="btn btn-primary">Detalles</button>
+                            class="btn btn-primary">View</button>
+                        <button v-else @click="detail(movie,'series')" class="btn btn-primary">View</button>
                     </div>
                 </div>
             </div>
@@ -78,7 +78,7 @@
                     if (this.type == 'movie') {
                         var config = {
                             method: 'get',
-                            url: 'https://api.themoviedb.org/3/discover/movie?&language=es-MX&sort_by=popularity.desc&with_genres=' + this.currGen.id + '',
+                            url: 'https://api.themoviedb.org/3/discover/movie?&language=en-US&sort_by=popularity.desc&with_genres=' + this.currGen.id + '',
                             headers: {
                                 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
                             }
@@ -94,7 +94,7 @@
                     } else {
                         var config = {
                             method: 'get',
-                            url: 'https://api.themoviedb.org/3/discover/tv?api_key=<<api_key>>&language=es-MX&sort_by=popularity.desc&with_genres=' + this.currGen.id + '',
+                            url: 'https://api.themoviedb.org/3/discover/tv?api_key=<<api_key>>&language=en-US&sort_by=popularity.desc&with_genres=' + this.currGen.id + '',
                             headers: {
                                 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
                             }
@@ -112,19 +112,17 @@
                 },
                 detail(obj, type) {
                     if (this.type == 'movie') {
-                        window.location.href = 'movie.html';
+                        window.location.href = '/movie.html';
                         localStorage.setItem('movie', JSON.stringify(obj));
                         localStorage.setItem('type', type)
                     } else if (type == 'series') {
-                        window.location.href = 'movie.html';
+                        window.location.href = '/movie.html';
                         localStorage.setItem('series', JSON.stringify(obj));
                         localStorage.setItem('type', type)
                     }
-                }, home() {
-                    window.location.href = "homePage.html"
                 },
                 home() {
-                    window.location.href = "homePage.html"
+                    window.location.href = "/index.html"
                 }
             },
             mounted() {
