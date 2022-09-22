@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/output.css">
+    <link rel="stylesheet" href="dist/output.css">
     <title>Cuevana77</title>
     <style>
         #radial {
@@ -176,7 +176,7 @@
             <p @click="viewSeasons(seasonInfo,currMovie)">View All Seasons</p>
         </div>
 
-        <p> Trailers :o</p>
+        <p> Trailers: </p>
         <div v-for="video in videosList">
             <iframe width="560" height="315" :src="`https://www.youtube.com/embed/${video.key}`"
                 title="YouTube video player" frameborder="0"
