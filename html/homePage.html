@@ -377,11 +377,11 @@
 				detail(obj, type) {
 					console.log(type)
 					if (type == 'movie') {
-						window.location.href = '/html/movie.html';
+						window.location.href = './html/movie.html';
 						localStorage.setItem('movie', JSON.stringify(obj));
 						localStorage.setItem('type', type)
 					} else if (type == 'series') {
-						window.location.href = '/html/movie.html';
+						window.location.href = './html/movie.html';
 						localStorage.setItem('series', JSON.stringify(obj));
 						localStorage.setItem('type', type)
 					}
@@ -390,12 +390,12 @@
 				selectGenre(g) {
 					if (this.moviesFlag) {
 						var type = 'movie'
-						window.location.href = "/html/genre.html"
+						window.location.href = "./html/genre.html"
 						localStorage.setItem('genre', JSON.stringify(g))
 						localStorage.setItem('type', type)
 					} else {
 						var type = 'series'
-						window.location.href = "/html/genre.html"
+						window.location.href = "./html/genre.html"
 						localStorage.setItem('genre', JSON.stringify(g))
 						localStorage.setItem('type', type)
 					}
@@ -444,7 +444,7 @@
 					this.srsPopular = false
 				},
 				home(){
-					window.location.href="/html/index.html"
+					window.location.href="./html/index.html"
 				}
 			},
 			mounted() {
