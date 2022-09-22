@@ -18,7 +18,7 @@
 <body>
     <div id="index">
         <div class="navbar bg-base-100 justify-end shadow-lg">
-            <a @click="home()" class="btn btn-ghost normal-case text-xl" href="/html/index.html">{{user.username}}</a>
+            <a @click="home()" class="btn btn-ghost normal-case text-xl">{{user.username}}</a>
             <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
@@ -710,7 +710,7 @@
                         });
                 },
                 home() {
-                    window.location.href = "/html/index.html"
+                    window.location.href = "/html/homePage.html"
                 },
                 viewSeason(tv, season) {
                     console.log(tv)
