@@ -80,7 +80,7 @@
                     axios(config)
                         .then(function (response) {
                             if (response.data.success) {
-                                window.location.href = 'html/homePage.html';
+                                window.location.href = './html/homePage.html';
                                 console.log("si te metiste")
                                 localStorage.setItem('user', JSON.stringify(User));
                             }
