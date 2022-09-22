@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/dist/output.css">
+    <title>Lista de episodios</title>
+</head>
+<!--Titulo de la temporada-->
+
+<body>
+    <div id="index">
+        <div class="navbar bg-base-100 justify-end shadow-lg">
+            <a @click="home()" class="btn btn-ghost normal-case text-xl">{{user.username}}</a>
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <img :src="`https://image.tmdb.org/t/p/w300/${user_avatar}`" />
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="card card-side bg-base-100 shadow-xl">
+            <figure><img :src="`https://image.tmdb.org/t/p/w300/${seriesdat.poster_path}`" /></figure>
+            <div class="card-body">
+                <H1>{{ numtemporada }} ({{ currDate[0] }})</H1>
+            </div>
+        </div>
+
+
+        <!--Numero de episodios-->
+        <div>
+            <h2>
+                capitulos: {{ numepisodios }}
+            </h2>
+        </div>
+
+
+
+        <!--Capitulos de la temporada-->
+        <div v-for="w in episodios" class="card card-side bg-base-100 shadow-xl">
+            <figure><img :src="`https://image.tmdb.org/t/p/w300/${w.still_path}`" /></figure>
+            <div class="card-body">
+                <h2 class="card-title">{{ w.episode_number }}.- {{ w.name }}</h2>
+                <p>{{ w.overview }}</p>
+                <p>{{ w.air_date }}</p>
+                <p>{{ w.runtime }} min</p>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script type="text/javascript">
+        const { createApp } = Vue
+
+        const app = createApp({
+            data() {
+                return {
+                    seriesdat: [],
+                    episodios: [],
+                    numepisodios: null,
+                    numtemporada: null,
+                    currDate: [],
+                    currSeason: [],
+                    currShow: [],
+                    user: [],
+                    user_avatar: null,
+
+
+                }
+            },
+
+            methods: {
+
+                episodes() {
+                    let vues = this
+                    var ssn = localStorage.getItem('season')
+                    ssn = JSON.parse(ssn)
+                    var ser = localStorage.getItem('tv')
+                    ser = JSON.parse(ser)
+
+                    this.currSeason = ssn
+                    this.currShow = ser
+                    console.log(this.currSeason)
+                    console.log(this.currShow)
+
+                    var usr = localStorage.getItem('user')
+                    usr = JSON.parse(usr)
+                    this.user = usr
+                    console.log(this.user)
+                    this.user_avatar = this.user.avatar.tmdb.avatar_path
+
+
+                    var config = {
+                        method: 'get',
+                        url: 'https://api.themoviedb.org/3/tv/' + this.currShow.id + '/season/' + this.currSeason.season_number + '?&language=es-MX',
+                        headers: {
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZDllZmVhNmYwNDI2MGJlZTM2YzkzNDlmNmQ2MGM1ZSIsInN1YiI6IjYzMWU2MWIxMGQyZjUzMDA4NDI5ZWUwNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.WWVZWdInybAOboJ10oRKUbWYhpCq0HJYyuPKvr8hybw'
+                        }
+                    };
+
+
+
+
+                    axios(config)
+                        .then(function (response) {
+                            vues.seriesdat = response.data
+                            vues.numtemporada = vues.seriesdat.name
+                            vues.numepisodios = vues.seriesdat.episodes.length
+                            vues.episodios = vues.seriesdat.episodes
+                            //console.log(vues.episodios)
+                            //console.log(vues.seriesdat)
+
+                            var auxDate = vues.seriesdat.air_date
+                            vues.currDate = auxDate.split('-')
+
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+
+                },home(){
+					window.location.href="/html/index.html"
+				}
+            },
+
+
+
+
+            mounted() {
+                this.episodes()
+
+            }
+        }).mount('#index')
+
+    </script>
+</body>
+
+</html>

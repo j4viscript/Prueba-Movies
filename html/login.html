@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/dist/output.css">
+    <title>Cuevana77</title>
+</head>
+
+<body class="bg-white dark:bg-slate-800 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">
+    <div id="contenedor" class="flex item-center justify-center h-screen bg-100">
+        <!-- Cambiar a fondo de página -->
+        <!-- <img class="absolute " :src="`https://image.tmdb.org/t/p/original/${bg}`" /> -->
+        <form>
+            <div class="bg-white w-96 p-6 rounded shadow-sm">
+                <div class="flex items-center justify-center mb-4">
+                    <img src="" alt="Logo" class="h-32">
+                </div>
+
+                <label class="text-gray-700">
+                    Username
+                </label>
+                <input class="w-full py-2 bg-gray-200 text-gray-500 px-1 outline-none mb-4" v-model="email" name=""
+                    required>
+                <label class="text-gray-700">
+                    Password
+                </label>
+                <input class="w-full py-2 bg-gray-200 text-gray-500 px-1 outline-none mb-4" type="password"
+                    v-model="password" name="" required>
+
+                <br>
+
+                <button class="bg-blue-500 w-full text-gray-100 py-2 rounded hover:bg-blue-600 transition-colors"
+                    @click="login">
+                    Acceder
+                </button>
+            </div>
+        </form>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script type="text/javascript">
+        const { createApp } = Vue
+
+        const app = createApp({
+            data() {
+                return {
+                    users: null,
+                    email: '',
+                    password: '',
+                    mostrarError: false,
+                    randMovie: null,
+                    bg: null
+                }
+            },
+            methods: {
+                login(e) {
+
+                    var User = {
+                        eml: this.email,
+                        psw: this.password
+                    }
+                    e.preventDefault()
+                    var data = new FormData();
+                    data.append('username', this.email);
+                    data.append('password', this.password);
+                    data.append('request_token', '');
+
+                    var config = {
+                        method: 'post',
+                        url: 'https://api.themoviedb.org/3/authentication/token/validate_with_login',
+                        headers: {
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwZjMzZWI5MjczNDMwYzE0OTkwNzM2MGU3ZTk1ZTVlNyIsInN1YiI6IjYzMWUyZWI4Yjg3YWVjMDA3Zjg5N2UyYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.VGSFNA0O6HUgqky9J7NTZU6ncl8mNstDGSTo1LWRfBM',
+                        },
+                        data: data
+                    };
+
+                    axios(config)
+                        .then(function (response) {
+                            if (response.data.success) {
+                                window.location.href = '/html/index.html';
+                                console.log("si te metiste")
+                                localStorage.setItem('user', JSON.stringify(User));
+                            }
+                            console.log(JSON.stringify(response.data));
+                        })
+                        .catch(function (error) {
+                            this.mostrarError = true;
+                            console.log(error);
+                        });
+                },
+                getBackground() {
+                    let vue = this
+                    var randNum = Math.floor(Math.random() * 10)
+
+                    var config = {
+                        method: 'get',
+                        url: 'https://api.themoviedb.org/3/trending/all/week',
+                        headers: {
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                        }
+                    };
+
+                    axios(config)
+                        .then(function (response) {
+                            vue.randMovie = response.data.results[randNum]
+                            vue.bg = vue.randMovie.backdrop_path
+                            console.log(vue.bg)
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            },
+            mounted() {
+                this.getBackground()
+            }
+        }).mount('#contenedor')
+    </script>
+</body>
+
+</html>

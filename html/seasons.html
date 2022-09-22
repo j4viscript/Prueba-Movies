@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/dist/output.css">
+    <title>Lista de Temporadas</title>
+</head>
+
+<body>
+    <div id="index">
+        <div class="navbar bg-base-100 justify-end shadow-lg">
+            <a @click="home()" class="btn btn-ghost normal-case text-xl">{{user.username}}</a>
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <img :src="`https://image.tmdb.org/t/p/w300/${user_avatar}`" />
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="card card-side bg-base-100 shadow-xl">
+            <figure><img :src="`https://image.tmdb.org/t/p/w300/${currShow.poster_path}`" /></figure>
+            <div class="card-body">
+                <H1>{{ currShow.name }} ({{ year }})</H1>
+            </div>
+        </div>
+
+        <div>
+            <h2>
+                <!-- capitulos: {{ numepisodios }} -->
+            </h2>
+        </div>
+
+        <div v-for="season in seasonList" class="card card-side bg-base-100 shadow-xl">
+            <figure><img :src="`https://image.tmdb.org/t/p/w300/${season.poster_path}`" /></figure>
+            <div class="card-body">
+                <h2 class="card-title">{{ season.name }}</h2>
+                <p>{{ season.overview }}</p>
+                <p>{{ season.air_date }}</p>
+                <button @click="episodes(season, currShow)" class="btn btn-primary">Detalles</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script type="text/javascript">
+        const { createApp } = Vue
+
+        const app = createApp({
+            data() {
+                return {
+
+                    seasonList: [],
+                    currShow: [],
+                    currDate: null,
+                    year: null,
+                    user: [],
+                    user_avatar: null,
+
+
+
+                }
+            },
+
+            methods: {
+
+                seasons() {
+                    var obj = localStorage.getItem('show')
+                    obj = JSON.parse(obj)
+
+                    this.seasonList = obj
+                    console.log(this.seasonList)
+
+                    var ser = localStorage.getItem('series')
+                    ser = JSON.parse(ser)
+
+                    this.currShow = ser
+                    console.log(this.currShow)
+
+                    var auxDate = this.currShow.first_air_date
+                    this.currDate = auxDate.split('-')
+                    this.year = this.currDate[0]
+
+                    var usr = localStorage.getItem('user')
+                    usr = JSON.parse(usr)
+                    this.user = usr
+                    console.log(this.user)
+                    this.user_avatar = this.user.avatar.tmdb.avatar_path
+
+                }, home() {
+                    window.location.href = "/html/index.html"
+                },
+                episodes(season, tv) {
+                    localStorage.setItem('tv', JSON.stringify(tv));
+                    localStorage.setItem('season', JSON.stringify(season));
+                    window.location.href = "/html/capitulos.html"
+                }
+            },
+
+            mounted() {
+                this.seasons()
+
+            }
+        }).mount('#index')
+
+    </script>
+</body>
+
+</html>

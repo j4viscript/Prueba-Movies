@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/dist/output.css">
+    <title>Cuevana77</title>
+</head>
+
+<body>
+    <div id="index">
+        <div class="navbar bg-base-100 justify-end shadow-lg">
+            <a @click="home()" class="btn btn-ghost normal-case text-xl">{{user.username}}</a>
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <img :src="`https://image.tmdb.org/t/p/w300/${user_avatar}`" />
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="p-5 w-1/5 text-lg text-white bg-slate-500">{{name}}</div>
+
+        <div class="flex flex-wrap justify-center mt-10">
+            <div v-for="movie in movies" class="card w-96 m-5 bg-base-100 drop-shadow-xl">
+                <figure><img :src="`https://image.tmdb.org/t/p/w300/${movie.poster_path}`" alt="Movie" /></figure>
+                <div class="card-body">
+                    <h2 v-if="(type == 'movie')" class="card-title">{{movie.title}}</h2>
+                    <h2 v-else class="card-title">{{movie.name}}</h2>
+
+                    <p>{{movie.overview}}</p>
+                    <div class="card-actions justify-end">
+                        <button v-if="(type == 'movie')" @click="detail(movie,'movie')"
+                            class="btn btn-primary">Detalles</button>
+                        <button v-else @click="detail(movie,'series')" class="btn btn-primary">Detalles</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script type="text/javascript">
+        const { createApp } = Vue
+        const app = createApp({
+            data() {
+                return {
+                    movies: [],
+                    currGen: null,
+                    name: null,
+                    type: null,
+					user: [],
+					user_avatar: null
+                }
+            },
+            methods: {
+                init() {
+                    this.type = localStorage.getItem('type')
+                    var gen = localStorage.getItem('genre')
+                    gen = JSON.parse(gen)
+                    this.currGen = gen
+                    this.name = this.currGen.name
+                    console.log(this.type)
+                    console.log("webos: " + this.currGen)
+
+                    var usr = localStorage.getItem('user')
+                    usr = JSON.parse(usr)
+                    this.user = usr
+                    console.log(this.user)
+                    this.user_avatar = this.user.avatar.tmdb.avatar_path
+
+                    let vue = this;
+
+                    if (this.type == 'movie') {
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/discover/movie?&language=es-MX&sort_by=popularity.desc&with_genres=' + this.currGen.id + '',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                vue.movies = response.data.results
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                    } else {
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/discover/tv?api_key=<<api_key>>&language=es-MX&sort_by=popularity.desc&with_genres=' + this.currGen.id + '',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                vue.movies = response.data.results
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                    }
+
+                },
+                detail(obj, type) {
+                    if (this.type == 'movie') {
+                        window.location.href = '/html/movie.html';
+                        localStorage.setItem('movie', JSON.stringify(obj));
+                        localStorage.setItem('type', type)
+                    } else if (type == 'series') {
+                        window.location.href = '/html/movie.html';
+                        localStorage.setItem('series', JSON.stringify(obj));
+                        localStorage.setItem('type', type)
+                    }
+                }, home() {
+                    window.location.href = "html/index.html"
+                },
+                home() {
+                    window.location.href = "/html/index.html"
+                }
+            },
+            mounted() {
+                this.init()
+            }
+        }).mount('#index')
+
+    </script>
+</body>
+
+</html>

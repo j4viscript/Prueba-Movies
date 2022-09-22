@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/dist/output.css">
+    <title>Cuevana77</title>
+</head>
+
+<body>
+    <div id="index">
+        <div class="navbar bg-base-100 justify-end shadow-lg">
+            <a @click="home()" class="btn btn-ghost normal-case text-xl">{{user.username}}</a>
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <img :src="`https://image.tmdb.org/t/p/w300/${user_avatar}`" />
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="info-actor flex flex-wrap justify-center ">
+            <div class="card w-96 p-5 bg-base-100 m-10 shadow-xl">
+                <figure><img :src="`https://image.tmdb.org/t/p/w200/${bdartist.profile_path}`" alt="Shoes"
+                        class="rounded" /></figure>
+            </div>
+            <div class="card bg-base-100 w-3/4 shadow-xl image-full">
+                <!--Informacion personal del artista-->
+                <div class="card-body">
+                    <h2 class="card-title">{{ bdartist.name }}</h2>
+                    <h1>Informacion Personal:</h1>
+                    <ul class="flex flex-wrap">
+                        <li class="flex">
+                            <h3 class="ml-5">Conocido por:</h3>
+                            <p class="ml-5">{{ bdartist.known_for_department }}</p>
+                        </li>
+                        <li class="flex">
+                            <h3 class="ml-5">Biography</h3>
+                            <p class="ml-5">{{ bdartist.biography }}</p>
+                        </li>
+                        <li class="flex">
+                            <h3 class="ml-5">Peliculas y series:</h3>
+                            <p class="ml-5">{{ works }}</p>
+                        </li>
+                        <li class="flex">
+                            <h3 class="ml-5">Sexo:</h3>
+                            <p class="ml-5" v-if="bdartist.gender==1">Mujer</p>
+                            <p class="ml-5" v-else>Hombre</p>
+                        </li>
+                        <li class="flex">
+                            <h3 class="ml-5">Cumpleaños:</h3>
+                            <p class="ml-5">{{ bdartist.birthday }}</p>
+                        </li>
+                        <li class="flex">
+                            <h3 class="ml-5">Lugar de Nacimiento:</h3>
+                            <p class="ml-5">{{ bdartist.place_of_birth }}</p>
+                        </li>
+                        <li class="flex">
+                            <h3 class="ml-5">También Conocido Como:</h3>
+                            <p class="ml-5">{{ bdartist.also_known_as }}</p>
+                        </li>
+                        <li class="flex">
+                            <p></p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!--Informacion de las peliculas y series donde actuo el artista-->
+            <div class="flex flex-wrap justify-center m-10">
+                <!--Posters(imagen de la peli o serie) donde actuo el artista-->
+                <div class="carousel carousel-center max-w-md p-4 space-x-4 bg-neutral rounded-box my-10">
+                    <div v-for="w in worksList" @click="enter(w)" class="carousel-item card w-72 bg-base-100 shadow-xl rounded-box">
+                        <figure class="px-10 pt-10">
+                            <img :src="`https://image.tmdb.org/t/p/w200/${w.poster_path}`" alt="Movies"
+                                class="rounded-xl" />
+                        </figure>
+                        <div class="card-body items-center text-center">
+                            <p class="ml-5">{{ w.title }}</p>
+                            <p class="ml-5">{{ w.name }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div tabindex="0" class="collapse collapse-arrow w-3/4 border border-base-300 bg-base-100 rounded-box">
+                    <div class="collapse-title text-xl font-medium">
+                        Filmografia
+                    </div>
+                    <ul v-for="w in worksList" class="bg-gray-400 ">
+                        <li class="collapse-content text-xl">
+                            <p @click="enter(w)" class="ml-5 p-2.5">{{ w.title }}</p>
+                        </li>
+                        <li class="collapse-content">
+                            <p class="ml-5">{{ w.name }}</p>
+                        </li>
+                        <li class="collapse-content">
+                            <p class="ml-5 p-2.5">Personaje: {{ w.character }}</p>
+                        </li>
+                        <li class="collapse-content">
+                            <p class="ml-5 border-b border-black p-2.5">Fecha de lanzamiento: {{ w.release_date }} {{
+                                w.first_air_date }}</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script type="text/javascript">
+        const { createApp } = Vue
+
+        const app = createApp({
+            data() {
+                return {
+                    bdartist: [],
+                    pelisyseries: [],
+                    worksList: [],
+                    works: null,
+
+                    user: [],
+                    user_avatar: null
+                }
+            },
+            methods: {
+                init() {
+                    let vue = this
+                    var artist = localStorage.getItem('person')
+                    artist = JSON.parse(artist)
+                    this.bdartist = artist
+                    console.log(this.bdartist)
+
+                    var usr = localStorage.getItem('user')
+                    usr = JSON.parse(usr)
+                    this.user = usr
+                    console.log(this.user)
+                    this.user_avatar = this.user.avatar.tmdb.avatar_path
+
+                    var config = {
+                        method: 'get',
+                        url: 'https://api.themoviedb.org/3/person/' + this.bdartist.id + '?&language=en-US',
+                        headers: {
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZDllZmVhNmYwNDI2MGJlZTM2YzkzNDlmNmQ2MGM1ZSIsInN1YiI6IjYzMWU2MWIxMGQyZjUzMDA4NDI5ZWUwNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.WWVZWdInybAOboJ10oRKUbWYhpCq0HJYyuPKvr8hybw'
+                        }
+                    };
+
+                    axios(config)
+                        .then(function (response) {
+                            vue.bdartist = response.data
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+
+                },
+                getWorks() {
+                    vues = this
+                    var config = {
+                        method: 'get',
+                        url: 'https://api.themoviedb.org/3/person/' + this.bdartist.id + '/combined_credits?&language=en-US',
+                        headers: {
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZDllZmVhNmYwNDI2MGJlZTM2YzkzNDlmNmQ2MGM1ZSIsInN1YiI6IjYzMWU2MWIxMGQyZjUzMDA4NDI5ZWUwNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.WWVZWdInybAOboJ10oRKUbWYhpCq0HJYyuPKvr8hybw'
+                        }
+                    };
+
+                    axios(config)
+                        .then(function (response) {
+                            vues.pelisyseries = response.data
+                            vues.works = vues.pelisyseries.cast.length
+                            vues.worksList = vues.pelisyseries.cast
+                            console.log(vues.worksList)
+
+
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+
+
+                },
+                enter(show) {
+                    if (show.media_type == 'movie') {
+                        localStorage.setItem('movie', JSON.stringify(show));
+                        localStorage.setItem('type','movie')
+                    } else {
+                        localStorage.setItem('series', JSON.stringify(show));
+                        localStorage.setItem('type','series')
+                    }
+                    window.location.href = '/html/movie.html';
+                },
+                home(){
+                    window.location.href="/html/index.html"
+                }
+
+            },
+            mounted() {
+                this.init()
+                this.getWorks()
+            }
+        }).mount('#index')
+
+    </script>
+</body>

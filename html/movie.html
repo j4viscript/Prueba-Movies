@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/dist/output.css">
+    <title>Cuevana77</title>
+    <style>
+        #radial {
+            --value: 50;
+            --size: 4rem
+        }
+    </style>
+</head>
+
+<body>
+    <div id="index">
+        <div class="navbar bg-base-100 justify-end shadow-lg">
+            <a @click="home()" class="btn btn-ghost normal-case text-xl" href="/html/index.html">{{user.username}}</a>
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <img :src="`https://image.tmdb.org/t/p/w300/${user_avatar}`" />
+                    </div>
+                </label>
+            </div>
+        </div>
+        <!-- Descripción de Película -->
+
+        <div class="movieInfo flex flex-wrap justify-center">
+            <div class="card w-3/4 bg-base-100 shadow-xl image-full">
+                <figure class="h-96"><img :src="`https://image.tmdb.org/t/p/original/${currMovie.backdrop_path}`"
+                        class="w-full" alt="Shoes" /></figure>
+                <div class="card-body">
+
+                    <!-- Poner y quitar pelicula de favoritos -->
+                    <label class="swap swap-flip text-2xl justify-end">
+                        <input type="checkbox" />
+
+                        <div v-if="favorited" @click="setFavorite(false)" class="swap-off">💗</div>
+                        <div v-if="favorited" @click="setFavorite(true)" class="swap-on">🤍</div>
+
+
+                        <div v-if="!favorited" @click="setFavorite(false)" class=" swap-on">💗</div>
+                        <div v-if="!favorited" @click="setFavorite(true)" class=" swap-off">🤍</div>
+
+
+                    </label>
+                    <!-- Titulo de película o serie -->
+                    <ul class="flex col">
+                        <li>
+                            <h2 v-if="(type == 'movie')" class="card-title">{{ currMovie.title }}</h2>
+                            <h2 v-else class="card-title">{{ currMovie.name }} ({{ currDate[0] }})</h2>
+                            <!-- Eslogan -->
+                            <p>{{currMovie.tagline}}</p>
+                            <!-- Clasificación -->
+                            <div>{{rating}}</div>
+                        </li>
+                        <li>
+                            <!-- Radial Rating -->
+                            <div id="radial" class="radial-progress ml-8 mr-8">{{value}}%</div>
+                        </li>
+                        <li>
+                            <input id="rate" type="range" min="0.5" max="5" value="0" class="range" step="0.5" />
+                            <div class="w-full flex justify-between text-sm px-2">
+                                <span>-</span>
+                                <span>1</span>
+                                <span>-</span>
+                                <span>2</span>
+                                <span>-</span>
+                                <span>3</span>
+                                <span>-</span>
+                                <span>4</span>
+                                <span>-</span>
+                                <span>5</span>
+                            </div>
+                        </li>
+                        <li>
+                            <button @click="setReseña()" class="btn btn-sm ml-5">Calificar</button>
+                            <button @click="deleteReseña()" class="btn btn-error btn-sm ml-5">Eliminar</button>
+                        </li>
+                    </ul>
+
+                    <ul class="flex flex-wrap">
+                        <li v-if="currGenres.length > 1" class="mr-1">
+                            Categorías:
+                        </li>
+                        <li v-else class="mr-1">
+                            Categoría:
+                        </li>
+                        <li v-for="gen in currGenres" class="mx-1">
+                            <a @click="getGenreMovies(gen)"> {{ gen.name }}</a>
+                        </li>
+                    </ul>
+                    <p>{{currMovie.overview}}</p>
+
+
+                    <!-- ***** Esta información se tiene que descomentar y acomodar ***** -->
+
+                    <!-- <p>Ingresos: {{ currMovie.revenue }}</p>
+                    <p>Presupuesto: {{ currMovie.budget }}</p>
+                    <p>Titulo original: {{ currMovie.original_title }}</p>
+                    <p>Lenguaje original: {{ currMovie.original_language }}</p> -->
+
+                    <ul v-if="(type == 'movie')" class="flex flex-wrap">
+                        <li class="m-10">
+                            <p>Estatus: {{ currMovie.status }}</p>
+                        </li>
+                        <li class="m-10">
+                            <p>Fecha de salida: {{ currMovie.release_date }}</p>
+                        </li>
+                        <li class="m-10">
+                            <p>Director: {{ currDirector }}</p>
+                        </li>
+                        <li v-if="currWriter">
+                            <p>Escritor: {{ currWriter }}</p>
+                        </li>
+                    </ul>
+                    <ul v-else>
+                        <li>
+                            <p>Creador : {{ createdBy }}</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Créditos de la película -->
+        <div class="flex justify-center">
+            <div class="carousel carousel-center w-3/4 p-4 space-x-4 rounded-box">
+                <div v-for="person in creditsCast" class="card carousel-item m-5 w-96 shadow-lg">
+                    <figure class="px-10 pt-10">
+                        <img :src="`https://image.tmdb.org/t/p/w200/${person.profile_path}`" class="rounded-xl"
+                            alt="Shoes" class="rounded-xl" />
+                    </figure>
+                    <div class="card-body items-center text-center">
+                        <h2 class="card-title">{{person.name}}</h2>
+                        <p>As: {{person.character}}</p>
+                        <div class="card-actions">
+                            <button @click="artist(person)" class="btn btn-primary">Detalles</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Palabras Clave -->
+        <div>
+            <p>Palabras Clave</p>
+            <ul v-for="item in keywords">
+                <li @click="getKeywordMovies(item)">
+                    {{ item.name }}
+                </li>
+            </ul>
+        </div>
+
+        <!-- Recomendaciones -->
+
+        <!-- Info de Temporadas -->
+        <div v-if="type=='series'">
+            <p>Temporada Actual</p>
+            <div class="card card-side bg-base-100 shadow-xl">
+                <figure><img :src="`https://image.tmdb.org/t/p/w200/${lastSeason.poster_path}`" alt="Movie" /></figure>
+                <div class="card-body">
+                    <h2 class="card-title">{{lastSeason.name}}</h2>
+                    <p>{{date[0]}} | {{lastSeason.episode_count}} Episodios</p>
+                    <!-- El overview si jala solo que hay pedos en el idioma, yo creo que vamos a cambiar todo a ingles -->
+                    <p>{{lastSeason.overview}}</p>
+                    <div class="card-actions justify-end">
+                        <button @click="viewSeason(currMovie,lastSeason)" class="btn btn-primary">Watch</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Este va a ser un link que te mande a la pagina de temporadas -->
+            <p @click="viewSeasons(seasonInfo,currMovie)">Ver todas las temporadas</p>
+        </div>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script type="text/javascript">
+        const { createApp } = Vue
+
+        const app = createApp({
+            data() {
+                return {
+                    currMovie: [],
+                    title: null,
+                    tagline: null,
+                    status: null,
+                    releaseDate: null,
+                    revenue: null,
+                    budget: null,
+                    overview: null,
+                    date: [],
+                    currDate: [],
+
+                    creditsCast: [],
+                    creditsCrew: [],
+                    currWriter: null,
+                    currDirector: null,
+
+                    currSeries: [],
+                    type: null,
+                    createdBy: null,
+
+                    genres: null,
+                    currGenres: [],
+                    seasonInfo: null,
+                    lastSeason: [],
+                    keywords: [],
+                    rating: null,
+
+                    value: null,
+                    user: [],
+                    user_avatar: null,
+
+                    favorited: false,
+                    reseñaValue: null
+
+                }
+            },
+            methods: {
+                init() {
+                    var v = document.querySelector('#radial')
+
+                    var usr = localStorage.getItem('user');
+
+                    var vue = this
+                    this.type = localStorage.getItem('type')
+                    console.log(this.type)
+
+                    if (this.type == 'movie') {
+                        var obj = localStorage.getItem('movie')
+                        obj = JSON.parse(obj)
+                        this.currMovie = obj
+
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/movie/' + this.currMovie.id + '?&language=es-MX',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                vue.currMovie = response.data
+
+                                //Porcentaje de reseñas
+                                vue.value = Math.floor(vue.currMovie.vote_average * 10)
+                                v.style.setProperty('--value', vue.value)
+                                console.log(vue.value)
+
+                                //console.log(vue.currMovie)
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+
+
+                    } else if (this.type == 'series') {
+                        var obj = localStorage.getItem('series')
+                        obj = JSON.parse(obj)
+                        this.currMovie = obj
+                        //console.log(this.currMovie)
+
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/tv/' + this.currMovie.id + '?&language=es-MX',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                vue.currMovie = response.data
+                                vue.seasonInfo = vue.currMovie.seasons
+                                vue.lastSeason = vue.seasonInfo[vue.seasonInfo.length - 1]
+                                //console.log(vue.currMovie)
+                                console.log("****")
+                                //console.log(vue.seasonInfo)
+                                //console.log(vue.lastSeason)
+
+                                //Separar cadena de fecha
+
+                                var auxDate = vue.lastSeason.air_date
+                                vue.date = auxDate.split('-')
+
+                                var auxDate2 = vue.currMovie.first_air_date
+                                vue.currDate = auxDate2.split('-')
+
+                                //Porcentaje de reseñas
+
+                                vue.value = Math.floor(vue.currMovie.vote_average * 10)
+                                v.style.setProperty('--value', vue.value)
+
+                                //console.log(vue.date)
+                                console.log(vue.seasonInfo)
+                                // console.log(vue.lastSeason)
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+
+                    }
+                    console.log(this.currMovie)
+
+                },
+                getCredits() {
+                    var vue = this
+
+                    if (this.type == 'movie') {
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/movie/' + this.currMovie.id + '/credits?&language=es-MX',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                vue.creditsCast = response.data.cast
+                                vue.creditsCrew = response.data.crew
+                                for (i = 0; i < vue.creditsCrew.length; i++) {
+                                    if (vue.creditsCrew[i].job == "Story") {
+                                        vue.currWriter = vue.creditsCrew[i].name
+                                    }
+                                    if (vue.creditsCrew[i].job == "Director") {
+                                        vue.currDirector = vue.creditsCrew[i].name
+                                    }
+
+                                }
+
+                                //console.log(vue.creditsCast)
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+
+                    } else if (this.type == 'series') {
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/tv/' + this.currMovie.id + '/credits?&language=es-MX',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                //console.log(response.data)
+                                vue.creditsCast = response.data.cast
+                                vue.createdBy = vue.currMovie.created_by[0].name
+                                //console.log(vue.currMovie.created_by[0].name)
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+
+                    }
+
+
+                },
+                id_genres() {
+                    let vue = this;
+
+                    var config = {
+                        method: 'get',
+                        url: 'https://api.themoviedb.org/3/genre/movie/list?&language=es-MX',
+                        headers: {
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                        }
+                    };
+
+                    axios(config)
+                        .then(function (response) {
+                            vue.genres = response.data.genres
+
+                            // Obtener generos
+                            var movGenres = vue.currMovie.genres.length
+                            for (i = 0; i < movGenres; i++) {
+                                for (j = 0; j < vue.genres.length; j++) {
+                                    if (vue.currMovie.genres[i].id == vue.genres[j].id) {
+                                        vue.currGenres.push({
+                                            id: vue.genres[j].id,
+                                            name: vue.genres[j].name
+                                        })
+                                    }
+                                }
+                            }
+                            // console.log(vue.currGenres)
+                            // console.log(vue.genres)
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+
+
+
+                },
+                getKeywords() {
+                    let vue = this
+                    this.type = localStorage.getItem('type')
+
+                    if (this.type == 'series') {
+                        var obj = localStorage.getItem('series')
+                        obj = JSON.parse(obj)
+                        this.currMovie = obj
+                        //console.log(this.currMovie)
+
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/tv/' + this.currMovie.id + '/keywords',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                vue.keywords = response.data.results
+                                console.log(vue.keywords)
+
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+
+                    } else {
+                        var obj = localStorage.getItem('movie')
+                        obj = JSON.parse(obj)
+                        this.currMovie = obj
+
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/movie/' + this.currMovie.id + '/keywords',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                vue.keywords = response.data.keywords
+                                console.log(vue.keywords)
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                    }
+                },
+                getRating() {
+                    let vue = this
+
+
+                    if (this.type == 'series') {
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/tv/' + this.currMovie.id + '/content_ratings?&language=en-US',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                vue.rating = response.data.results[0].rating
+                                console.log(vue.rating);
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                    }
+
+                },
+                artist(person) {
+                    localStorage.setItem('person', JSON.stringify(person))
+                    window.location.href = "/html/person.html"
+
+                },
+                getGenreMovies(genre) {
+                    localStorage.setItem('genre', JSON.stringify(genre))
+                    window.location.href = "/html/genre.html"
+                },
+                getKeywordMovies(keyword) {
+                    localStorage.setItem('keyword', JSON.stringify(keyword))
+                    window.location.href = "/html/keyword.html"
+                },
+                getFavorites() {
+                    let vue = this
+
+                    var usr = localStorage.getItem('user')
+                    usr = JSON.parse(usr)
+                    this.user = usr
+                    console.log(this.user)
+                    this.user_avatar = this.user.avatar.tmdb.avatar_path
+
+                    if (this.type == 'series') {
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/account/' + this.user.id + '/favorite/tv',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                for (i = 0; i < response.data.results.length; i++) {
+                                    if (vue.currMovie.id == response.data.results[i].id) {
+                                        vue.favorited = true
+                                    }
+                                }
+                                console.log("---------------")
+                                console.log(response.data)
+
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+
+                    } else {
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/account/' + this.user.id + '/favorite/movies',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+
+                        axios(config)
+                            .then(function (response) {
+                                for (i = 0; i < response.data.results.length; i++) {
+                                    if (vue.currMovie.id == response.data.results[i].id) {
+                                        vue.favorited = true
+                                    }
+                                }
+                                console.log("-----a-------")
+                                console.log(response.data)
+
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                    }
+
+                },
+                setFavorite(set) {
+                    let vue = this
+                    if (!set) {
+                        if (this.type == 'series') {
+                            var data = JSON.stringify({
+                                "media_type": "tv",
+                                "media_id": this.currMovie.id,
+                                "favorite": false
+                            });
+                        } else {
+                            var data = JSON.stringify({
+                                "media_type": "movie",
+                                "media_id": this.currMovie.id,
+                                "favorite": false
+                            });
+
+                        }
+                    } else {
+                        if (this.type == 'series') {
+                            var data = JSON.stringify({
+                                "media_type": "tv",
+                                "media_id": this.currMovie.id,
+                                "favorite": true
+                            });
+                        } else {
+                            var data = JSON.stringify({
+                                "media_type": "movie",
+                                "media_id": this.currMovie.id,
+                                "favorite": true
+                            });
+                            this.favorted = true
+                        }
+                    }
+
+
+                    var config = {
+                        method: 'post',
+                        url: 'https://api.themoviedb.org/3/account/' + this.user.id + '/favorite?',
+                        headers: {
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc',
+                            'Content-Type': 'application/json'
+                        },
+                        data: data
+                    };
+
+                    axios(config)
+                        .then(function (response) {
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                },
+                getReseña() {
+                    var r = document.querySelector('#rate')
+                    let vue = this
+                    if (this.type == 'series') {
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/account/' + this.user.id + '/rated/tv?language=es-MX&sort_by=created_at.asc&page=1',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+                    } else {
+                        var config = {
+                            method: 'get',
+                            url: 'https://api.themoviedb.org/3/account/' + this.user.id + '/rated/movies?language=es-MX&sort_by=created_at.asc&page=1',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+                    }
+
+
+                    axios(config)
+                        .then(function (response) {
+                            for (i = 0; i < response.data.results.length; i++) {
+                                if (vue.currMovie.id == response.data.results[i].id) {
+                                    vue.reseñaValue = response.data.results[i].rating
+                                }
+                            }
+
+                            if (!vue.reseñaValue) {
+                                r.value = 0.5
+                            } else {
+                                r.value = vue.reseñaValue
+                            }
+
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+
+                },
+                setReseña() {
+                    var r = document.querySelector('#rate')
+
+                    var data = JSON.stringify({
+                        "value": r.value
+                    });
+
+                    if (this.type == 'movie') {
+                        var config = {
+                            method: 'post',
+                            url: 'https://api.themoviedb.org/3/movie/' + this.currMovie.id + '/rating',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc',
+                                'Content-Type': 'application/json'
+                            },
+                            data: data
+                        };
+                    } else {
+                        var config = {
+                            method: 'post',
+                            url: 'https://api.themoviedb.org/3/tv/' + this.currMovie.id + '/rating',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc',
+                                'Content-Type': 'application/json'
+                            },
+                            data: data
+                        };
+                    }
+
+                    axios(config)
+                        .then(function (response) {
+                            console.log(JSON.stringify(response.data));
+                            alert("Reseña enviada con éxito")
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+
+                },
+                deleteReseña() {
+                    if (this.type == 'movie') {
+                        var config = {
+                            method: 'delete',
+                            url: 'https://api.themoviedb.org/3/movie/' + this.currMovie.id + '/rating?',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+                    } else {
+                        var config = {
+                            method: 'delete',
+                            url: 'https://api.themoviedb.org/3/tv/' + this.currMovie.id + '/rating?',
+                            headers: {
+                                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZWRjOWQ0OTY0ZmVhMDA4YmVkNGVkMjc0ZDZkN2JjOSIsInN1YiI6IjYzMjAxYTY3Y2MyNzdjMDA4YTYxMTU3ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7SvRwk9oBs-BTvnhJe74ufeZZ43f3QhGqHGvVDWlxXc'
+                            }
+                        };
+                    }
+
+                    axios(config)
+                        .then(function (response) {
+                            console.log(JSON.stringify(response.data));
+                            alert("Reseña eliminada con éxito")
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                },
+                home() {
+                    window.location.href = "/html/index.html"
+                },
+                viewSeason(tv, season) {
+                    console.log(tv)
+                    console.log(season)
+                    localStorage.setItem('tv', JSON.stringify(tv));
+                    localStorage.setItem('season', JSON.stringify(season));
+                    window.location.href = "/html/capitulos.html"
+                },
+                viewSeasons(show,series){
+                    console.log(show)
+                    localStorage.setItem('show', JSON.stringify(show));
+                    console.log(series)
+                    localStorage.setItem('series', JSON.stringify(series));
+                    window.location.href = "/html/seasons.html"
+                }
+
+            },
+            mounted() {
+                this.init()
+                this.getCredits()
+                this.id_genres()
+                this.getKeywords()
+                this.getRating()
+                this.getFavorites()
+                this.getReseña()
+
+            }
+        }).mount('#index')
+
+    </script>
+</body>
+
+</html>
